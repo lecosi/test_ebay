@@ -77,44 +77,44 @@ def request_ebay():
 def generate_html(category_id):
     conn = sqlite3.connect('ebaydb.db')
     c = conn.cursor()
-    f = open('{0}.html'.format(category_id), 'w')
-    f.write('<html>\n')
-    f.write('<head>\n')
-    f.write('    <title>{0}</title>\n'.format(category_id))
-    f.write('</head>\n')
-    f.write('<body>\n')
-
     query = c.execute("SELECT * FROM categories WHERE categoryId = ?", (category_id,))
-    print(query)
-    #if query.fetchone() != None: 
-    for row in query:
-        f.write('    <ul>\n')
-        parent_id = row[0]
-        parent_name = row[1]
-        print('Raiz', parent_id, parent_name)
-        f.write('        <li>{0}: {1}</li>\n'.format(parent_id, parent_name))
+    trae_category = query.fetchall()
+    if trae_category:
+        f = open('{0}.html'.format(category_id), 'w')
+        f.write('<html>\n')
+        f.write('<head>\n')
+        f.write('    <title>{0}</title>\n'.format(category_id))
+        f.write('</head>\n')
+        f.write('<body>\n')
+        for row in trae_category:
+            f.write('    <ul>\n')
+            parent_id = row[0]
+            parent_name = row[1]
+            print('Raiz', parent_id, parent_name)
+            f.write('        <li>{0}: {1}</li>\n'.format(parent_id, parent_name))
 
-        f.write('        <ul>\n')
-        query_child = c.execute("SELECT * FROM categories WHERE CategoryParentID = ?", (parent_id,))
-        for row in query_child:
-            child_id = row[0]
-            child_name = row[1]
-            print('Hijo', child_id, child_name)
-            f.write('            <li>{0}: {1}</li>\n'.format(child_id, child_name))
+            f.write('        <ul>\n')
+            query_child = c.execute("SELECT * FROM categories WHERE CategoryParentID = ?", (parent_id,))
+            for row in query_child:
+                child_id = row[0]
+                child_name = row[1]
+                print('Hijo', child_id, child_name)
+                f.write('            <li>{0}: {1}</li>\n'.format(child_id, child_name))
 
-        f.write('        </ul>\n')
+            f.write('        </ul>\n')
 
-        f.write('    </ul>\n')
+            f.write('    </ul>\n')
 
-    f.write('</body>\n')
-    f.write('</html>')
-    f.close()
-    c.close()
-    conn.close()
-    webbrowser.open('{0}.html'.format(category_id), new=2)
-    #else:
-     #   print("No existe <categoryId> = ", category_id)
-      #  sys.exit(2)
+        f.write('</body>\n')
+        f.write('</html>')
+        f.close()
+        c.close()
+        conn.close()
+        webbrowser.open('{0}.html'.format(category_id), new=2)
+
+    else:
+        print("no existe category_id = ", category_id)
+        sys.exit(2)
 
 def main(argv):
     if len(argv) < 2:
