@@ -85,35 +85,36 @@ def generate_html(category_id):
     f.write('<body>\n')
 
     query = c.execute("SELECT * FROM categories WHERE categoryId = ?", (category_id,))
-    if query.fetchone() != None: 
-        for row in query:
-            f.write('    <ul>\n')
-            parent_id = row[0]
-            parent_name = row[1]
-            print('Raiz', parent_id, parent_name)
-            f.write('        <li>{0}: {1}</li>\n'.format(parent_id, parent_name))
+    print(query)
+    #if query.fetchone() != None: 
+    for row in query:
+        f.write('    <ul>\n')
+        parent_id = row[0]
+        parent_name = row[1]
+        print('Raiz', parent_id, parent_name)
+        f.write('        <li>{0}: {1}</li>\n'.format(parent_id, parent_name))
 
-            f.write('        <ul>\n')
-            query_child = c.execute("SELECT * FROM categories WHERE CategoryParentID = ?", (parent_id,))
-            for row in query_child:
-                child_id = row[0]
-                child_name = row[1]
-                print('Hijo', child_id, child_name)
-                f.write('            <li>{0}: {1}</li>\n'.format(child_id, child_name))
+        f.write('        <ul>\n')
+        query_child = c.execute("SELECT * FROM categories WHERE CategoryParentID = ?", (parent_id,))
+        for row in query_child:
+            child_id = row[0]
+            child_name = row[1]
+            print('Hijo', child_id, child_name)
+            f.write('            <li>{0}: {1}</li>\n'.format(child_id, child_name))
 
-            f.write('        </ul>\n')
+        f.write('        </ul>\n')
 
-            f.write('    </ul>\n')
+        f.write('    </ul>\n')
 
-        f.write('</body>\n')
-        f.write('</html>')
-        f.close()
-        c.close()
-        conn.close()
-        webbrowser.open('{0}.html'.format(category_id), new=2)
-    else:
-        print("No existe <categoryId> = ", category_id)
-        sys.exit(2)
+    f.write('</body>\n')
+    f.write('</html>')
+    f.close()
+    c.close()
+    conn.close()
+    webbrowser.open('{0}.html'.format(category_id), new=2)
+    #else:
+     #   print("No existe <categoryId> = ", category_id)
+      #  sys.exit(2)
 
 def main(argv):
     if len(argv) < 2:
