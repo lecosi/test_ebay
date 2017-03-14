@@ -92,31 +92,24 @@ def generate_html(category_id):
         parent_id = trae_category[0][0]
         parent_name = trae_category[0][1]
         print('Raiz', parent_id, parent_name)
-        f.write('        <li>{0}: {1}</li>\n'.format(parent_id, parent_name))        
-        f.write('        <div>\n')
+        f.write('\t\t<li>{0}: {1}</li>\n'.format(parent_id, parent_name))        
+        f.write('\t\t<div>\n')
 
-        def search_child(child_id):
-            query_child = c.execute("SELECT * FROM categories WHERE CategoryParentID = ? AND categoryId <> ?", (child_id, 20081))
-            query_child_data = query_child.fetchall()
-            if query_child_data:
-                for row in query_child_data:
-                    child_id = row[0]
-                    child_name = row[1]
-                    print(child_id, "----", child_name) 
-                    f.write('            <div>{0}\n'.format(child_name))
-                    f.write('               <div>{0}\n'.format(search_child(child_id)))   
-                    f.write('               </div>\n')            
-                    f.write('            </div>\n')        
+        def print_children(parent_id, parent_name):
+            children = c.execute('SELECT * FROM categories WHERE CategoryParentID = ? AND categoryId <> ?', (parent_id, category_id)).fetchall()
+            if children:
+                f.write('\t<ul>parent: {0}- {1}\n'.format(parent_id, parent_name))
+                for child in children:
+                    child_id = child[0]
+                    child_name = child[1]
+                    print_children(child_id, child_name)
+                f.write('\t</ul>\n')
             else:
-                f.write('            <div>{0}</div>\n'.format(parent_name,))
-                
-                             
-            """f.write('            <li>{0}: {1}</li>\n'.format(child_id, child_name))
+                f.write('\t\t<li>{0} - {1}</li>\n'.format(parent_id, parent_name))
 
-            f.write('        </ul>\n')"""
-        return search_child(parent_id)
+        print_children(parent_id,parent_name)
 
-        f.write('    </div>\n')
+        f.write('\t\t</div>\n')
 
         f.write('</body>\n')
         f.write('</html>')
@@ -128,12 +121,6 @@ def generate_html(category_id):
     else:
         print("no existe category_id = ", category_id)
         sys.exit(2)
-
-"""def search_child(child_id):
-    conn = sqlite3.connect('ebaydb.db')
-    c = conn.cursor()
-    query_child = c.execute("SELECT * FROM categories WHERE CategoryParentID = ?", (child_id,))
-    return query_child.fetchall()"""
 
 def main(argv):
     if len(argv) < 2:
