@@ -93,28 +93,28 @@ def generate_html(category_id):
         parent_name = trae_category[0][1]
         print('Raiz', parent_id, parent_name)
         f.write('        <li>{0}: {1}</li>\n'.format(parent_id, parent_name))        
-        f.write('        <ul>\n')
+        f.write('        <div>\n')
 
         def search_child(child_id):
-            query_child = query_child = c.execute("SELECT * FROM categories WHERE CategoryParentID = ?", (child_id,))
+            query_child = c.execute("SELECT * FROM categories WHERE CategoryParentID = ?", (child_id,))
             query_child_data = query_child.fetchall()
             if query_child_data:
                 for row in query_child_data:
                     child_id = row[0]
                     child_name = row[1] 
-                    f.write('            <li>{0}\n'.format(child_name))
-                    f.write('               <ul>{0}\n'.format(search_child(child_id)))   
-                    f.write('               </ul>\n')            
-                    f.write('            </li>\n')        
+                    f.write('            <div>{0}\n'.format(child_name))
+                    f.write('               <div>{0}\n'.format(search_child(child_id)))   
+                    f.write('               </div>\n')            
+                    f.write('            </div>\n')        
             else:
-                f.write('            <li>{0}</li>\n'.format(parent_name,))
+                f.write('            <div>{0}</div>\n'.format(parent_name,))
                              
             """f.write('            <li>{0}: {1}</li>\n'.format(child_id, child_name))
 
             f.write('        </ul>\n')"""
         return search_child(parent_id)
 
-        f.write('    </ul>\n')
+        f.write('    </div>\n')
 
         f.write('</body>\n')
         f.write('</html>')
