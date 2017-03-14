@@ -96,18 +96,20 @@ def generate_html(category_id):
         f.write('        <div>\n')
 
         def search_child(child_id):
-            query_child = c.execute("SELECT * FROM categories WHERE CategoryParentID = ?", (child_id,))
+            query_child = c.execute("SELECT * FROM categories WHERE CategoryParentID = ? AND categoryId <> ?", (child_id, 20081))
             query_child_data = query_child.fetchall()
             if query_child_data:
                 for row in query_child_data:
                     child_id = row[0]
-                    child_name = row[1] 
+                    child_name = row[1]
+                    print(child_id, "----", child_name) 
                     f.write('            <div>{0}\n'.format(child_name))
                     f.write('               <div>{0}\n'.format(search_child(child_id)))   
                     f.write('               </div>\n')            
                     f.write('            </div>\n')        
             else:
                 f.write('            <div>{0}</div>\n'.format(parent_name,))
+                
                              
             """f.write('            <li>{0}: {1}</li>\n'.format(child_id, child_name))
 
