@@ -6,6 +6,8 @@ import webbrowser
 from tqdm import tqdm
 import os, sys
 
+
+sys.setrecursionlimit(10000)
 cont = 0
 def load_data():
     if os.path.exists('./ebaydb.db'):
@@ -92,13 +94,12 @@ def generate_html(category_id):
         print('Raiz', parent_id, parent_name)
         f.write('        <li>{0}: {1}</li>\n'.format(parent_id, parent_name))        
         f.write('        <ul>\n')
-        search_child(parent_id)
 
         def search_child(child_id):
             query_child = query_child = c.execute("SELECT * FROM categories WHERE CategoryParentID = ?", (child_id,))
             query_child_data = query_child.fetchall()
             if query_child_data:
-                for row in query_child_dataa:
+                for row in query_child_data:
                     child_id = row[0]
                     child_name = row[1] 
                     f.write('            <li>{0}\n'.format(child_name))
@@ -111,6 +112,7 @@ def generate_html(category_id):
             """f.write('            <li>{0}: {1}</li>\n'.format(child_id, child_name))
 
             f.write('        </ul>\n')"""
+        return search_child(parent_id)
 
         f.write('    </ul>\n')
 
