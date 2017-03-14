@@ -6,6 +6,7 @@ import webbrowser
 from tqdm import tqdm
 import os, sys
 
+cont = 0
 def load_data():
     if os.path.exists('./ebaydb.db'):
         print ("base de datos existe")
@@ -86,24 +87,32 @@ def generate_html(category_id):
         f.write('    <title>{0}</title>\n'.format(category_id))
         f.write('</head>\n')
         f.write('<body>\n')
-        for row in trae_category:
-            f.write('    <ul>\n')
-            parent_id = row[0]
-            parent_name = row[1]
-            print('Raiz', parent_id, parent_name)
-            f.write('        <li>{0}: {1}</li>\n'.format(parent_id, parent_name))
+        parent_id = trae_category[0][0]
+        parent_name = trae_category[0][1]
+        print('Raiz', parent_id, parent_name)
+        f.write('        <li>{0}: {1}</li>\n'.format(parent_id, parent_name))        
+        f.write('        <ul>\n')
+        search_child(parent_id)
 
-            f.write('        <ul>\n')
-            query_child = c.execute("SELECT * FROM categories WHERE CategoryParentID = ?", (parent_id,))
-            for row in query_child:
-                child_id = row[0]
-                child_name = row[1]
-                print('Hijo', child_id, child_name)
-                f.write('            <li>{0}: {1}</li>\n'.format(child_id, child_name))
+        def search_child(child_id):
+            query_child = query_child = c.execute("SELECT * FROM categories WHERE CategoryParentID = ?", (child_id,))
+            query_child_data = query_child.fetchall()
+            if query_child_data:
+                for row in query_child_dataa:
+                    child_id = row[0]
+                    child_name = row[1] 
+                    f.write('            <li>{0}\n'.format(child_name))
+                    f.write('               <ul>{0}\n'.format(search_child(child_id)))   
+                    f.write('               </ul>\n')            
+                    f.write('            </li>\n')        
+            else:
+                f.write('            <li>{0}</li>\n'.format(parent_name,))
+                             
+            """f.write('            <li>{0}: {1}</li>\n'.format(child_id, child_name))
 
-            f.write('        </ul>\n')
+            f.write('        </ul>\n')"""
 
-            f.write('    </ul>\n')
+        f.write('    </ul>\n')
 
         f.write('</body>\n')
         f.write('</html>')
@@ -115,6 +124,12 @@ def generate_html(category_id):
     else:
         print("no existe category_id = ", category_id)
         sys.exit(2)
+
+"""def search_child(child_id):
+    conn = sqlite3.connect('ebaydb.db')
+    c = conn.cursor()
+    query_child = c.execute("SELECT * FROM categories WHERE CategoryParentID = ?", (child_id,))
+    return query_child.fetchall()"""
 
 def main(argv):
     if len(argv) < 2:
